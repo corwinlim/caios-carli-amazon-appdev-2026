@@ -1,0 +1,31 @@
+{
+  "name": "caios-carli-amazon-appdev-2026",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@caios/sdk": "file:../../packages/sdk",
+    "next": "16.2.12",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@testing-library/jest-dom": "6.8.0",
+    "@testing-library/react": "16.3.0",
+    "@testing-library/user-event": "14.6.1",
+    "@types/node": "24.1.0",
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7",
+    "jsdom": "26.1.0",
+    "typescript": "5.9.2",
+    "vitest": "3.2.4"
+  }
+}
