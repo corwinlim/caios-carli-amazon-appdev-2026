@@ -27,7 +27,7 @@ jobs:
         run: npm run build
       - name: Secret pattern scan
         run: |
-          if grep -RInE --exclude='*.md' --exclude='LICENSE' --exclude-dir='.git' 'SUPABASE_SERVICE_ROLE_KEY|AWS_SECRET_ACCESS_KEY|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|sk-(live|proj)-' .; then
+          if grep -RInE --exclude='*.md' --exclude='LICENSE' --exclude-dir='.git' --exclude-dir='.github' 'SUPABASE_SERVICE_ROLE_KEY|AWS_SECRET_ACCESS_KEY|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|sk-(live|proj)-' .; then
             echo 'Potential secret pattern found'
             exit 1
           fi
