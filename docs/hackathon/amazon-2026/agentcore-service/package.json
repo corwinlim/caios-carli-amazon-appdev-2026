@@ -1,0 +1,10 @@
+{
+  "name": "caios-carli-agentcore-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "build": "tsc -p tsconfig.json", "start": "node dist/app.js" },
+  "dependencies": { "@strands-agents/sdk": "latest", "express": "latest", "zod": "^4.4.3" },
+  "devDependencies": { "@types/express": "latest", "@types/node": "^24.1.0", "typescript": "^5.9.2" }
+}
