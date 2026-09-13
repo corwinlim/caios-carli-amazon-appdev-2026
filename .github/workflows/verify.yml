@@ -1,0 +1,33 @@
+name: Verify public Amazon AppDev slice
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        working-directory: apps/web
+        run: npm install
+      - name: Test
+        working-directory: apps/web
+        run: npm run test
+      - name: Typecheck
+        working-directory: apps/web
+        run: npm run typecheck
+      - name: Build
+        working-directory: apps/web
+        run: npm run build
+      - name: Secret pattern scan
+        run: |
+          if grep -RInE --exclude='*.md' --exclude='LICENSE' --exclude-dir='.git' 'SUPABASE_SERVICE_ROLE_KEY|AWS_SECRET_ACCESS_KEY|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|sk-(live|proj)-' .; then
+            echo 'Potential secret pattern found'
+            exit 1
+          fi
