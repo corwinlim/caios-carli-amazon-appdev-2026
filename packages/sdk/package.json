@@ -1,0 +1,6 @@
+{
+  "name": "@caios/sdk",
+  "version": "0.0.0-public-hackathon",
+  "private": true,
+  "types": "index.d.ts"
+}
