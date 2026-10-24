@@ -4,6 +4,7 @@ Synthetic identity only. Never calls MCP. Hash chain is tamper-evident only
 against accidental edits, not a trusted external append-only ledger.
 """
 import hashlib
+from contextlib import contextmanager
 import json
 import sqlite3
 import time
@@ -30,10 +31,16 @@ class AuditLedger:
                 event TEXT NOT NULL, detail TEXT NOT NULL, prior_hash TEXT NOT NULL,
                 event_hash TEXT NOT NULL)""")
 
+    @contextmanager
     def db(self):
+        """Commit on success, rollback on error, and always close on Windows."""
         db = sqlite3.connect(self.path, timeout=10)
-        db.execute("PRAGMA busy_timeout=10000")
-        return db
+        try:
+            db.execute("PRAGMA busy_timeout=10000")
+            with db:
+                yield db
+        finally:
+            db.close()
 
     def _append(self, db, operation_id, event, detail):
         previous = db.execute("SELECT event_hash FROM audit_events ORDER BY seq DESC LIMIT 1").fetchone()
