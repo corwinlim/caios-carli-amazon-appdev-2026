@@ -4,6 +4,7 @@ Demo-only administrative mutation interface. A real service must restrict
 who can mutate grants and use a trusted identity provider.
 """
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
 
 class PetGrantStore:
@@ -16,10 +17,16 @@ class PetGrantStore:
                 active INTEGER NOT NULL CHECK(active IN (0,1)),
                 PRIMARY KEY(owner_id,pet_id,scope))""")
 
+    @contextmanager
     def _db(self):
+        """Commit/rollback and always close, including on Windows/Python 3.14."""
         db = sqlite3.connect(self.path, timeout=10)
-        db.execute("PRAGMA busy_timeout=10000")
-        return db
+        try:
+            db.execute("PRAGMA busy_timeout=10000")
+            with db:
+                yield db
+        finally:
+            db.close()
 
     def set_grant_for_test(self, owner_id, pet_id, scope, active):
         """Only test harnesses may administer grants; NEVER expose to a client."""
