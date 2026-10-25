@@ -5,6 +5,7 @@ A matching hash detects accidental modification, not malicious re-signing.
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 def verify(directory):
@@ -47,7 +48,13 @@ def verify(directory):
         if "PASS" not in (root/"boundary.log").read_text(encoding="utf-8"):
             return False,"boundary log incomplete"
         unit=(root/"unittest.log").read_text(encoding="utf-8")
-        if "Ran " not in unit or "\\nOK" not in unit:
+        lines = unit.splitlines()
+        summaries = [line for line in lines
+                     if re.fullmatch(r"Ran [1-9]\d* tests? in \d+(?:\.\d+)?s", line)]
+        nonempty = [line for line in lines if line.strip()]
+        failed = any(re.match(r"^(?:FAILED\b|FAIL:|ERROR:|Traceback\b)", line)
+                     for line in lines)
+        if len(summaries) != 1 or not nonempty or nonempty[-1] != "OK" or failed:
             return False,"test log incomplete"
         return True,"verified local receipt and logs"
     except (OSError,ValueError,TypeError,KeyError,UnicodeError) as exc:

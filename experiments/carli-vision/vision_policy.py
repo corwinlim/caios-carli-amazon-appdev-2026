@@ -32,6 +32,8 @@ def propose(signal: Signal) -> dict[str, Any]:
         outcome, action = "occluded_observation", "request_more_evidence"
     elif signal.bowl_near:
         outcome, action = "possible_bowl_proximity", "request_owner_confirmation"
+    elif signal.motion_frames > 0:
+        outcome, action = "unclassified_roi_pixel_motion", "request_owner_review"
     else:
         outcome, action = "no_relevant_activity_confirmed", "continue_observation"
     return {
