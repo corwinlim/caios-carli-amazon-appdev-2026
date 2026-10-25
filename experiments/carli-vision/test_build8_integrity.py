@@ -32,6 +32,26 @@ class EvidenceVerifierTests(unittest.TestCase):
             hashlib.sha256(raw).hexdigest()+"  BUILD7_EVIDENCE.json\n",encoding="utf-8")
     def test_valid_receipt(self):
         self.assertTrue(verify(self.root)[0])
+    def replace_log(self, body):
+        path = self.root / 'unittest.log'
+        path.write_bytes(body.encode())
+        self.data['steps'][1]['log_sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+        self.seal()
+    def test_windows_line_endings_accepted(self):
+        self.replace_log('Ran 132 tests in 1.000s\r\n\r\nOK\r\n')
+        self.assertTrue(verify(self.root)[0])
+    def test_literal_escaped_newline_not_accepted(self):
+        self.replace_log(r'Ran 132 tests in 1.000s\nOK')
+        self.assertFalse(verify(self.root)[0])
+    def test_failed_run_cannot_append_fake_ok(self):
+        self.replace_log('Ran 132 tests in 1.000s\nFAILED (failures=1)\nOK\n')
+        self.assertFalse(verify(self.root)[0])
+    def test_zero_tests_not_a_pass(self):
+        self.replace_log('Ran 0 tests in 0.000s\n\nOK\n')
+        self.assertFalse(verify(self.root)[0])
+    def test_unrelated_ok_text_not_a_pass(self):
+        self.replace_log('Ran 132 tests in 1.000s\n\\nOK in a quoted message\n')
+        self.assertFalse(verify(self.root)[0])
     def test_tampered_log_rejected(self):
         (self.root/"unittest.log").write_text("FAIL",encoding="utf-8")
         self.assertFalse(verify(self.root)[0])
