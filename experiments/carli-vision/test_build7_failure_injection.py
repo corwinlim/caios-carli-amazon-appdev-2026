@@ -42,7 +42,7 @@ class FailureInjectionTests(unittest.TestCase):
             with self.assertRaises(PermissionError): self.approve(pending)
     def test_missing_grant_table_denies(self):
         self.grant()
-        with sqlite3.connect(self.store.path) as db:
+        with self.store._db() as db:
             db.execute("DROP TABLE pet_grants")
         with self.assertRaises(PermissionError): self.prepare()
     def test_revoke_after_prepare_denies_approve(self):
