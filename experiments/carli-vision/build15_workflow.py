@@ -25,6 +25,7 @@ class ReviewWorkflow:
     def prepare(self, owner, action, payload, evidence_sha256, operation_id):
         if action != "record_observation":
             raise PermissionError("only record_observation is allowed")
+        _bound_approval_payload(operation_id, payload)  # validate before writes
         # Register operation before issuing approval token. If interrupted,
         # pending operation remains inert and requires a fresh operator review.
         self.audit.prepare(evidence_sha256, payload, operation_id)
