@@ -47,7 +47,7 @@ def verify(directory):
         if "PASS" not in (root/"boundary.log").read_text(encoding="utf-8"):
             return False,"boundary log incomplete"
         unit=(root/"unittest.log").read_text(encoding="utf-8")
-        if "Ran " not in unit or "\\nOK" not in unit:
+        if "Ran " not in unit or "\nOK" not in unit:
             return False,"test log incomplete"
         return True,"verified local receipt and logs"
     except (OSError,ValueError,TypeError,KeyError,UnicodeError) as exc:
