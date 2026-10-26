@@ -8,6 +8,13 @@ from pathlib import Path
 from persistent_approval import PersistentApproval
 from audit_ledger import AuditLedger
 
+def _bound_approval_payload(operation_id, payload):
+    """Domain-separate approval tokens by operation without changing audit payload."""
+    if not isinstance(operation_id, str) or not operation_id:
+        raise ValueError("operation_id required")
+    return {"domain": "carli-p0a-operation-approval-v1",
+            "operation_id": operation_id, "payload": payload}
+
 class ReviewWorkflow:
     def __init__(self, directory, clock=None):
         root = Path(directory)
@@ -21,7 +28,7 @@ class ReviewWorkflow:
         # Register operation before issuing approval token. If interrupted,
         # pending operation remains inert and requires a fresh operator review.
         self.audit.prepare(evidence_sha256, payload, operation_id)
-        token = self.approvals.prepare(owner, action, payload)
+        token = self.approvals.prepare(owner, action, _bound_approval_payload(operation_id, payload))
         return {"operation_id":operation_id, "approval_token":token,
                 "status":"pending_owner_review", "mcp_tool_invoked":False}
 
@@ -34,7 +41,7 @@ class ReviewWorkflow:
         from audit_ledger import sha
         if row[1] != sha(payload):
             raise PermissionError("operation payload mismatch")
-        approval = self.approvals.approve(token,authenticated_owner,"record_observation",payload)
+        approval = self.approvals.approve(token,authenticated_owner,"record_observation",_bound_approval_payload(operation_id, payload))
         # Failure here leaves consumed approval + pending audit. Fail closed.
         self.audit.transition(operation_id,"pending","ready","approved_synthetic")
         result = self.audit.dry_run(operation_id)
