@@ -1,7 +1,7 @@
 name: Verify isolated OpenCV vision prototype
 on:
   push:
-    branches: [fix/opencv-quality-receipt-20261026, feat/opencv-aws-review-proof]
+    branches: [fix/opencv-quality-receipt-20261026, feat/opencv-aws-review-proof, feat/opencv-judge-demo]
   pull_request:
     paths:
       - 'experiments/carli-vision/**'
