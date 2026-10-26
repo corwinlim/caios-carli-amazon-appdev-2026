@@ -1,12 +1,33 @@
 name: Verify isolated OpenCV vision prototype
 on:
   push:
-    branches: [fix/opencv-quality-receipt-20261026, feat/opencv-aws-review-proof]
+    branches: [fix/opencv-quality-receipt-20261026, feat/opencv-aws-review-proof, feat/opencv-judge-demo]
   pull_request:
     paths:
       - 'experiments/carli-vision/**'
       - '.github/workflows/opencv-vision.yml'
 jobs:
+  windows-launcher:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Verify Windows launcher and full regression
+        shell: powershell
+        working-directory: experiments/carli-vision
+        run: ./start_judge_demo.ps1 -PythonExecutable (Get-Command python).Source -VerifyOnly
+      - name: Verify automatic reuse of installed environment
+        shell: powershell
+        working-directory: experiments/carli-vision
+        run: ./start_judge_demo.ps1 -VerifyOnly
   python-vision:
     runs-on: ubuntu-latest
     permissions:

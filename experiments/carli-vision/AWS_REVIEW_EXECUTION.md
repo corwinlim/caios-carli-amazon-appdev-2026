@@ -48,4 +48,4 @@ Execution gates: correct account and assumed role → exact deployed function/ru
 
 ## Remaining delivery
 
-Restore target role access; service-validate/review deployment; obtain real linked AWS receipts for dark/moving/static inputs; complete parent review UI and care-record integration; evaluate consented dog/cat footage; record ≤5-minute working demo; finish OpenCV-specific report and submission archive. Preserve the existing Amazon AppDev and Nebius submission boundaries.
+Restore target role access; service-validate/review deployment; obtain real linked AWS receipts for dark/moving/static inputs; complete rendered-browser QA and authorized care-record integration; evaluate consented dog/cat footage; record ≤5-minute working demo; finish OpenCV-specific report and submission archive. Preserve the existing Amazon AppDev and Nebius submission boundaries.

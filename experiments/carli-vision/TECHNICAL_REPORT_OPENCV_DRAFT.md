@@ -24,7 +24,7 @@ flowchart TD
     A -. "Integration pending" .-> H["Parent review and care record"]
 ```
 
-The existing CARLi approval/grant modules remain isolated offline prototypes. This work does not establish a network-connected approval-to-care-record integration.
+A loopback browser demo now connects video upload, measured routing, sampled frames, explicit parent review, SQLite save and JSON export. It uses one local demo bearer identity and does not write to CAIOS. The existing CARLi approval/grant modules remain separate offline prototypes; no production-authorized approval-to-care-record integration is established.
 
 ## OpenCV implementation
 
@@ -36,7 +36,7 @@ Clear moving pixels route to `request_owner_review`; clear static footage routes
 
 ## Evaluation performed
 
-The prior repair executed 154 Python tests, with passing GitHub OpenCV CI and existing Web CI at commit `cb0e249b90b5737cd123220acf4e38a73d997aaf`. The cloud-review extension executed a complete local suite of 166 tests. The extension's remote CI must be read independently after publication.
+The prior repair executed 154 Python tests, with passing GitHub OpenCV CI and existing Web CI at commit `cb0e249b90b5737cd123220acf4e38a73d997aaf`. The cloud-review extension executed a complete local suite of 166 tests; the local HTTP review demo extends this to 172 passing tests. The extension's remote CI must be read independently after publication.
 
 | Encoded synthetic fixture | Measured quality | Result |
 |---|---|---|
@@ -61,7 +61,7 @@ The candidate Lambda has no public endpoint or pet-state write capability. Its p
 
 - Restore correct AWS access, review/deploy staging and collect real dark/moving/static invocation receipts.
 - Evaluate labelled, consented cat and dog clips; document false positives and failure cases.
-- Implement and verify a usable parent-review surface and confirmed care-record integration.
+- Complete desktop/mobile browser QA of the local review surface and integrate an authorized CAIOS care-record consumer.
 - Establish judge-accessible running endpoint or arrange a real live screen-share.
 - Record an accessible ≤5-minute video showing the team, running app, actual architecture and results.
 - Freeze final SHA/archive and complete the OpenCV Devpost fields and submission receipt.
