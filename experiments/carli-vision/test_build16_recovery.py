@@ -2,7 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from build15_workflow import ReviewWorkflow
+from build15_workflow import ReviewWorkflow, _bound_approval_payload
 from build16_recovery import inspect_operation, write_evidence
 
 class Build16Tests(unittest.TestCase):
@@ -15,7 +15,7 @@ class Build16Tests(unittest.TestCase):
         self.prepared=self.workflow.prepare("synthetic-owner","record_observation",self.payload,"a"*64,"op16")
 
     def test_consumed_but_audit_pending_is_manual(self):
-        self.workflow.approvals.approve(self.prepared["approval_token"],"synthetic-owner","record_observation",self.payload)
+        self.workflow.approvals.approve(self.prepared["approval_token"],"synthetic-owner","record_observation",_bound_approval_payload("op16",self.payload))
         result=inspect_operation(self.root,"op16")
         self.assertEqual(result["status"],"manual_reconciliation_required")
         self.assertFalse(result["safe_to_dispatch"])
