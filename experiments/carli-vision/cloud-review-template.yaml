@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CARLi isolated OpenCV review router candidate - not deployed
+Parameters:
+  ArtifactBucket:
+    Type: String
+  ArtifactKey:
+    Type: String
+  ArtifactObjectVersion:
+    Type: String
+  ArtifactCodeSha256:
+    Type: String
+    AllowedPattern: '[A-Za-z0-9+/]{43}='
+Resources:
+  ReviewLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/carli-opencv-review-staging
+      RetentionInDays: 7
+  ReviewRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: WriteOwnReviewLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !GetAtt ReviewLogs.Arn
+  ReviewFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: ReviewLogs
+    Properties:
+      FunctionName: carli-opencv-review-staging
+      Runtime: python3.12
+      Handler: vision_cloud.handler
+      Role: !GetAtt ReviewRole.Arn
+      Code:
+        S3Bucket: !Ref ArtifactBucket
+        S3Key: !Ref ArtifactKey
+        S3ObjectVersion: !Ref ArtifactObjectVersion
+      Timeout: 10
+      MemorySize: 128
+      ReservedConcurrentExecutions: 1
+      Tags:
+        - Key: Project
+          Value: CARLi-OpenCV
+        - Key: Environment
+          Value: isolated-staging
+  ReviewVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref ReviewFunction
+      CodeSha256: !Ref ArtifactCodeSha256
+Outputs:
+  VersionedFunctionArn:
+    Value: !Ref ReviewVersion

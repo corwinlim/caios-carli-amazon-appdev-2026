@@ -1,7 +1,7 @@
 name: Verify isolated OpenCV vision prototype
 on:
   push:
-    branches: [fix/opencv-quality-receipt-20261026]
+    branches: [fix/opencv-quality-receipt-20261026, feat/opencv-aws-review-proof]
   pull_request:
     paths:
       - 'experiments/carli-vision/**'
@@ -17,9 +17,9 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
-          cache-dependency-path: experiments/carli-vision/requirements.txt
+          cache-dependency-path: experiments/carli-vision/requirements*.txt
       - name: Install pinned dependencies
-        run: python -m pip install -r experiments/carli-vision/requirements.txt
+        run: python -m pip install -r experiments/carli-vision/requirements-aws.txt
       - name: Runtime versions
         run: python -c "import sys, cv2, numpy; print(sys.version); print('OpenCV', cv2.__version__); print('numpy', numpy.__version__); assert cv2.__version__.split('.')[0] == '5'"
       - name: Full Python regression suite
