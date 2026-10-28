@@ -18,10 +18,11 @@ def inspect_operation(root, operation_id):
     if row is None:
         return {"operation_id":operation_id,"status":"unknown_operation","safe_to_dispatch":False}
     audit_state, payload_hash, evidence_hash = row
-    with workflow.approvals.connect() as db:
-        matches = db.execute("SELECT state FROM approvals WHERE payload_hash=?", (payload_hash,)).fetchall()
-    states = [r[0] for r in matches]
-    if audit_state == "pending" and "consumed" in states:
+    # Operation-bound approval hashes cannot be joined to the raw audit
+    # payload hash without the original payload. Conservatively classify
+    # all pending operations as requiring manual reconciliation.
+    states = []
+    if audit_state == "pending":
         status = "manual_reconciliation_required"
     elif audit_state == "dispatched_unknown":
         status = "dispatch_outcome_unknown"
