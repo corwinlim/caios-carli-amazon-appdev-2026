@@ -4,6 +4,7 @@ import hmac
 import secrets
 import sqlite3
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from audit_ledger import sha
 
@@ -23,10 +24,15 @@ class AtomicReview:
                 operation_id TEXT NOT NULL, event TEXT NOT NULL,
                 prior_hash TEXT NOT NULL, event_hash TEXT NOT NULL)""")
 
+    @contextmanager
     def _db(self):
         db = sqlite3.connect(self.path, timeout=10)
-        db.execute("PRAGMA busy_timeout=10000")
-        return db
+        try:
+            db.execute("PRAGMA busy_timeout=10000")
+            with db:
+                yield db
+        finally:
+            db.close()
 
     def _event(self, db, operation_id, event):
         row = db.execute("SELECT event_hash FROM atomic_events ORDER BY seq DESC LIMIT 1").fetchone()
